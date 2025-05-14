@@ -1,10 +1,10 @@
 #include <windows.h>
 #include <iostream>
-
+#include <cctype>
 using namespace std;
 
 
-void simulateKeyPress(BYTE keyCode) {
+void simulateKeyPress(BYTE keyCodeByte, char keyCodeChar) {
     // Struktur für die Eingabe
     INPUT ip;
 
@@ -15,7 +15,7 @@ void simulateKeyPress(BYTE keyCode) {
     ip.ki.dwExtraInfo = 0;
 
     // Taste drücken
-    ip.ki.wVk = keyCode; // Virtueller Tastencode
+    ip.ki.wVk = keyCodeByte; // Virtueller Tastencode
     ip.ki.dwFlags = 0; // 0 für Tastendruck
     SendInput(1, &ip, sizeof(INPUT));
 
@@ -24,17 +24,39 @@ void simulateKeyPress(BYTE keyCode) {
     SendInput(1, &ip, sizeof(INPUT));
 
     // Anzeigen, welcher Tastendruck simuliert wurde
-    std::cout << "Simulierter Tastendruck: " << keyCode << std::endl;
+    std::cout << "Simulierter Tastendruck: " << char(tolower(keyCodeChar)) << std::endl;
+
 }
 
 int main() {
-    // Beispiel: Simulation des Tastendrucks für die Taste 'A'
-   
+    
     char n;
+    
+    
 
     cin >> n;
+    Sleep(2000);
+
+   
+
     
-    simulateKeyPress(n);
+        BYTE keyCodeByte = toupper(n); // Wandelt den Buchstaben in Großbuchstaben um
+
+
+        char keyCodeChar = toupper(n);
+
+    
+ 
+   
+   
+
+
+    // Überprüfen des virtuellen Tastencodes
+    UINT scanCode = MapVirtualKey(keyCodeByte, MAPVK_VK_TO_VSC);
+    std::cout << "Virtueller Tastencode: " << (int)keyCodeByte << ", Scan-Code: " << scanCode << std::endl;
+    
+
+    simulateKeyPress(keyCodeByte, keyCodeChar);
 
     return 0;
 }

@@ -17,13 +17,13 @@
 // Global variables
 bool shiftActive = false;
 // Ensure the ButtonInfo struct is declared before using it in the std::vector declaration.  
-struct ButtonInfo {  
-    std::wstring text; // Text of the button  
-    int x; // x-position of the button  
-    int y; // y-position of the button  
-    int width; // Width of the button  
-    int height; // Height of the button  
-};  
+struct ButtonInfo {
+	std::wstring text; // Text of the button  
+	int x; // x-position of the button  
+	int y; // y-position of the button  
+	int width; // Width of the button  
+	int height; // Height of the button  
+};
 std::vector<ButtonInfo> flatButtons;
 // Correct the std::vector declaration by ensuring ButtonInfo is a valid type.  
 
@@ -60,10 +60,10 @@ void simulateShiftPlusOne(char n) {
 	ip[0].ki.wVk = VK_SHIFT; // Virtueller Tastencode !Byte wird als wert erwartet
 	ip[0].ki.dwFlags = 0; // 0 für Tastendruck
 
-	
 
 
-	 //Tastendruck wird gesendet
+
+	//Tastendruck wird gesendet
 	SendInput(1, ip, sizeof(INPUT));
 }
 
@@ -127,7 +127,7 @@ void simulateALtGr(char n) {
 	// Anzeigen, welcher Tastendruck simuliert wurde
 
 
-	
+
 }
 void simulateST(char n) {
 	INPUT ip[1] = { 0 };
@@ -147,7 +147,7 @@ void simulateST(char n) {
 
 	SendInput(1, ip, sizeof(INPUT));
 
-	
+
 }
 
 void simulateKeyPressG(BYTE keyCodeByte, char zeichen) {
@@ -208,7 +208,7 @@ void simulateKeyPressk(BYTE keyCodeByte) {
 	// Anzeigen, welcher Tastendruck simuliert wurde
 
 
-	
+
 }
 //x,y position des fensters	braucht man nicht, Offset:
 
@@ -346,9 +346,9 @@ int WINAPI WinMain(                         //Wie wird funktion aufgerufen
 				}
 			}
 
-			
-            // Update the push_back call to ensure the correct constructor is used for ButtonInfo.  
-            flatButtons.push_back(ButtonInfo{ std::wstring(key), x, y, w, h });
+
+			// Update the push_back call to ensure the correct constructor is used for ButtonInfo.  
+			flatButtons.push_back(ButtonInfo{ std::wstring(key), x, y, w, h });
 			x += w + s;
 		}
 		y += defaultHeight + spacing;
@@ -534,8 +534,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						{"F12", VK_F12},
 
 		};
-		
-		
+
+
 		int buttonId = LOWORD(wParam);
 		int index = buttonId - 100;
 		if (index >= 0 && index < flatButtons.size()) {
@@ -554,9 +554,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			//2.Fall sonderzeichen mapping mit Mapaltgr
 
-			
 
-		else if (buttonText == L"LSHIFT" || buttonText == L"RSHIFT") {
+
+			else if (buttonText == L"LSHIFT" || buttonText == L"RSHIFT") {
 				if (!shiftActive) {
 					INPUT ip = { 0 };
 					ip.type = INPUT_KEYBOARD;
@@ -567,50 +567,47 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 					return 0;
 				}
-				if(shiftActive == true && buttonText.size() == 1) {
-					
+				if (shiftActive == true && buttonText.size() == 1) {
+
 					simulateKeyPressG(toupper(zeichen), zeichen); // Shift-Taste loslassen und Taste drücken
-				
-					
+
+
 
 					shiftActive = false;
-					return 0;
-				
-				}
-
-				else if(buttonText == L"ALT") {}
-
-				
-				}
-				
-				else {
-					shiftActive = false;
-					simulateKeyPressk(zeichen); // Shift-Taste loslassen und Taste drücken
-				
+					simulateKeyPressk(zeichen);
 					return 0;
 
-				 
+				}
+
+				
+
+
+			
+
+			
+
+
 				// keypress zweite taste
 				// ausgabe von beiden tasten
 				// tste hoch
-				
-				 }
 
-
-			
-			
-
-					
-				
 			}
+
+
+
+
+
+
+
 		}
+	}
 
 
-		
-			
 
 
-	
+
+
+
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;

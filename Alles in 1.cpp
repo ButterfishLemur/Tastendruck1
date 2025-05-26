@@ -16,6 +16,10 @@
 
 // Global variables
 bool shiftActive = false;
+
+bool AltGrActive = false;
+
+
 // Ensure the ButtonInfo struct is declared before using it in the std::vector declaration.  
 struct ButtonInfo {
 	std::wstring text; // Text of the button  
@@ -50,22 +54,7 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 //Gibt eine Nummer an, bspw 1 bed: fenster hat sich geöfnet usw
 //letzten parameter geben an um was es sich bei msg handelt
 
-void simulateShiftPlusOne(char n) {
 
-	// Struktur für die Eingabe in ip werden die Variablen von unten eingesetzt
-	INPUT ip[1] = { 0 };
-
-	// Allg. für eingabe sagt soviel wie: Eingabe ist Tastendruck 
-	ip[0].type = INPUT_KEYBOARD;
-	ip[0].ki.wVk = VK_SHIFT; // Virtueller Tastencode !Byte wird als wert erwartet
-	ip[0].ki.dwFlags = 0; // 0 für Tastendruck
-
-
-
-
-	//Tastendruck wird gesendet
-	SendInput(1, ip, sizeof(INPUT));
-}
 
 void simulateKeyPressPlus(char n) {
 	INPUT ip[2] = { 0 };
@@ -296,8 +285,8 @@ int WINAPI WinMain(                         //Wie wird funktion aufgerufen
 		{ L"^", L"1", L"2", L"3", L"4", L"5", L"6", L"7", L"8", L"9", L"0", L"ß", L"´",L"BACK" ,L"INSERT", L"HOME", L"PAGE UP"},
 		{ L"TAB", L"Q", L"W", L"E", L"R", L"T", L"Z", L"U", L"I", L"O", L"P", L"Ü", L"+" ,L"RETURN", L"DELETE", L"END", L"PAGE DOWN" },
 		{ L"CAPS LOCK", L"A", L"S", L"D", L"F", L"G", L"H", L"J", L"K", L"L", L"Ö", L"Ä",L"#" },
-		{ L"LSHIFT", L"<", L"Y", L"X", L"C", L"V", L"B", L"N", L"M", L",", L".", L"-",L"RSHIFT" ,L"ARROW UP"},
-		{ L"LCTRL", L"LWIN", L"ALT", L"SPACE", L"ALT GR", L"RWIN", L"MENU", L"RCTRL", L"ARROW LEFT", L"ARROW DOWN", L"ARROW RIGHT"}
+		{ L"LSHIFT", L"<", L"Y", L"X", L"C", L"V", L"B", L"N", L"M", L",", L".", L"-",L"RSHIFT" ,L"UP"},
+		{ L"LCTRL", L"LWIN", L"ALT", L"SPACE", L"ALT GR", L"RWIN", L"MENU", L"RCTRL", L"LEFT", L"DOWN", L"RIGHT"}
 	};
 
 	// Beispiel: Zwei benutzerdefinierte Tasten
@@ -415,75 +404,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	switch (message)    //wenn message (feedback von windows ist:
 	{
-	case WM_PAINT:          //programm wird eöfnet 
+	case WM_PAINT: {       //programm wird eöfnet 
 
 		hdc = BeginPaint(hWnd, &ps);//kreiere das fenster in dem anderen fenster.
 
-		// Here your application is laid out.
-		// For this introduction, we just print out "Hello, Windows desktop!"
-		// in the top left corner.
 		TextOut(hdc,
 			5, 5,
 			greeting, int(_tcslen(greeting)));
-		// End application-specific layout section.
+
 
 		EndPaint(hWnd, &ps);
 		break;
-	case WM_COMMAND:
-	{
+	}
+	case WM_COMMAND: {
+
 		Sleep(3000);
-		std::map<char, char> MapSZ = {
 
-			// Sonderzeichen von Nummern 
-			{ '!', '1' },
-			{ '"', '2' },
-			{ '§', '3' },
-			{ '$', '4' },
-			{ '%', '5' },
-			{ '&', '6' },
-			{ '/', '7' },
-			{ '(', '8' },
-			{ ')', '9' },
-			{ '=', '0' },
-
-			//Nicht nummer Sonderzeichen
-
-			{ '`', '´' },
-			{ '*', '+' },
-			{ ';', ',' },
-			{ ':', '.' },
-			{ '_', '-' },
-			{ '>', '<' },
-			{ '°', '^' },
-
-			//Hier EscapeCharacter: \ z.B. verwendung \' 
-
-	//funktioniert noch nicht!!!!!!!
-
-			{'\'','#'},
-
-
-
-		};
-
-		//AltGr SZ
-		std::map<char, char> MapAlTGr = {
-
-			//AltGr Zahl
-			{'²','2'},
-			{'³','q'},
-			{'{','7'},
-			{'[','8'},
-			{']','q'},
-			{'}','0'},
-
-			//AtGr Nicht Zahl
-			{'@','q'},
-			{'€','e'},
-			{'~','+'},
-			{'|','<'}
-
-		};
+		int buttonId = LOWORD(wParam);
+		int index = buttonId - 100;
 
 		//ST
 		std::map<std::string, int> MapST = {
@@ -506,12 +444,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				{"RCONTROL", VK_RCONTROL},
 
 				//systemtasten Block 2
-					{"EINF", VK_INSERT},
+					{"INSERT", VK_INSERT},
 					{"POS1", VK_HOME},
-					{"BILDUP",VK_PRIOR},
-					{"ENTF", VK_DELETE},
-					{"ENDE", VK_END},
-					{"BILDDOWN",VK_NEXT},
+					{"PAGE UP",VK_PRIOR},
+					{"DELETE", VK_DELETE},
+					{"END", VK_END},
+					{"PAGE DOWN",VK_NEXT},
 
 					{"UP", VK_UP},
 					{"LEFT", VK_LEFT},
@@ -536,78 +474,84 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		};
 
 
-		int buttonId = LOWORD(wParam);
-		int index = buttonId - 100;
+
+
 		if (index >= 0 && index < flatButtons.size()) {
 			std::wstring buttonText = flatButtons[index].text;
 			char zeichen = static_cast<char>(buttonText[0]);
-
-			//1.Fall : kleinbuchstabe/Zahl Geht
-
-
-			if (buttonText.size() == 1 && isalnum(zeichen)) {
-				simulateKeyPressk(zeichen);
-
-				return 0;
-
-			}
-
-			//2.Fall sonderzeichen mapping mit Mapaltgr
+			//If shift , dann merken shift gedrückt
+			// else if altgr dann merken altgr gedrückt
+			// else taste drücken
+				// MapST 
+				// Sim: Shift + Taste drücken,
+					//shift loslassen	
+				// SHift, alt + taste drücken, 
+					//altgr loslassen
+				//taste drücken 
 
 
 
-			else if (buttonText == L"LSHIFT" || buttonText == L"RSHIFT") {
+			//shift bool true
+
+			if (buttonText == L"LSHIFT" || buttonText == L"RSHIFT") {
 				if (!shiftActive) {
-					INPUT ip = { 0 };
-					ip.type = INPUT_KEYBOARD;
-					ip.ki.wVk = VK_SHIFT;
-					ip.ki.dwFlags = 0; // Key down
-					SendInput(1, &ip, sizeof(INPUT));
-
+					shiftActive = true;
 
 					return 0;
 				}
+			}
+			//AltGr bool true
+
+			else if (buttonText == L"ALT GR") {
+				if (!AltGrActive) {
+					AltGrActive = true;
+
+					return 0;
+				}
+			}
+
+
+			//Tste drücken
+				//if bool shift true
+			else {
 				if (shiftActive == true && buttonText.size() == 1) {
 
-					simulateKeyPressG(toupper(zeichen), zeichen); // Shift-Taste loslassen und Taste drücken
-
-
+					simulateKeyPressG(zeichen, zeichen);
 
 					shiftActive = false;
-					simulateKeyPressk(zeichen);
+
+
+					return 0;
+				}
+				if (AltGrActive == true && buttonText.size() == 1) {
+					simulateALtGr(zeichen);
+
+					AltGrActive = false;
+
 					return 0;
 
 				}
 
-				
+				if (MapST.find(std::string(buttonText.begin(), buttonText.end())) != MapST.end()) {
+					simulateST(MapST[std::string(buttonText.begin(), buttonText.end())]);
+
+					return 0;
 
 
-			
+				}
 
-			
+				else {
+					simulateKeyPressk(zeichen);
 
 
-				// keypress zweite taste
-				// ausgabe von beiden tasten
-				// tste hoch
-
+					return 0;
+				}
 			}
 
 
-
-
-
-
-
+			break;
 		}
 	}
-
-
-
-
-
-
-
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
@@ -615,15 +559,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return DefWindowProc(hWnd, message, wParam, lParam);
 		break;
 	}
+	
 
 	return 0;
 }
 
 
 
-/*std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-std::string str = converter.to_bytes(buttonText);
-
-if (MapST.find(str) != MapST.end()) {
-	simulateST(MapST[str]);
-}*/

@@ -19,6 +19,8 @@ bool shiftActive = false;
 
 bool AltGrActive = false;
 
+bool CapsLockActive = false; 
+
 
 // Ensure the ButtonInfo struct is declared before using it in the std::vector declaration.  
 struct ButtonInfo {
@@ -510,6 +512,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				}
 			}
 
+		
+			else if (buttonText == L"CAPS LOCK") {
+				if (!CapsLockActive) {
+					CapsLockActive = true;
+					return 0;
+				}
+				if (CapsLockActive == true) {
+						CapsLockActive = false;
+						return 0;
+					}
+					
+					
+				
+			}
+
+			
+
+			
 
 			//Tste drücken
 				//if bool shift true
@@ -531,6 +551,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					return 0;
 
 				}
+
+				if (CapsLockActive == true && buttonText.size() == 1) {
+
+					simulateKeyPressG(zeichen, zeichen);
+
+					return 0;
+
+				}
+
+
 
 				if (MapST.find(std::string(buttonText.begin(), buttonText.end())) != MapST.end()) {
 					simulateST(MapST[std::string(buttonText.begin(), buttonText.end())]);
